@@ -1,6 +1,8 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Rating;
+import com.nnk.springboot.service.RatingService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -9,46 +11,83 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
+
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class RatingController {
-    // TODO: Inject Rating service
+    @Autowired
+    private RatingService ratingService;
+
+    //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
 
     @RequestMapping("/rating/list")
-    public String home(Model model)
+    public String displayRatingList(Model model)
     {
-        // TODO: find all Rating, add to model
+        List<Rating> ratings = ratingService.findAll();
+        model.addAttribute("ratings", ratings);
         return "rating/list";
     }
 
     @GetMapping("/rating/add")
-    public String addRatingForm(Rating rating) {
+    public String displayAddRatingForm(Rating rating) {
         return "rating/add";
     }
 
     @PostMapping("/rating/validate")
-    public String validate(@Valid Rating rating, BindingResult result, Model model) {
-        // TODO: check data valid and save to db, after saving return Rating list
+    public String validateAddRating(@Valid Rating rating, BindingResult bindingResult, Model model) {
+
+        if(!bindingResult.hasErrors()) {
+            rating = ratingService.save(rating);
+            return "redirect:list";
+        }
+
         return "rating/add";
     }
 
     @GetMapping("/rating/update/{id}")
-    public String showUpdateForm(@PathVariable("id") Integer id, Model model) {
-        // TODO: get Rating by Id and to model then show to the form
-        return "rating/update";
+    public String displayUpdateRatingForm(@PathVariable("id") Integer id, Model model) {
+
+        if(id != null) {
+            Optional<Rating> optionalRating = ratingService.findById(id);
+            if(optionalRating.isPresent()) {
+                model.addAttribute("rating", optionalRating.get());
+                return "rating/update";
+            } else {
+                return "redirect:/rating/list?error";
+            }
+        } else {
+            return "redirect:/rating/list?error";
+        }
     }
 
-    @PostMapping("/rating/update/{id}")
-    public String updateRating(@PathVariable("id") Integer id, @Valid Rating rating,
-                             BindingResult result, Model model) {
-        // TODO: check required fields, if valid call service to update Rating and return Rating list
-        return "redirect:/rating/list";
+    @PostMapping("/rating/update")
+    public String updateRating(@Valid Rating rating, BindingResult bindingResult, Model model) {
+
+        if(!bindingResult.hasErrors()) {
+            rating = ratingService.save(rating);
+            return "redirect:/rating/list";
+        }
+
+        model.addAttribute("rating", rating);
+        return "rating/update";
     }
 
     @GetMapping("/rating/delete/{id}")
     public String deleteRating(@PathVariable("id") Integer id, Model model) {
-        // TODO: Find Rating by Id and delete the Rating, return to Rating list
-        return "redirect:/rating/list";
+
+        if(id != null) {
+            Optional<Rating> optionalRating = ratingService.findById(id);
+            if(optionalRating.isPresent()) {
+                ratingService.delete(optionalRating.get());
+                return "redirect:/rating/list";
+            } else {
+                return "redirect:/rating/list?error";
+            }
+        } else {
+            return "redirect:/rating/list?error";
+        }
     }
 }
