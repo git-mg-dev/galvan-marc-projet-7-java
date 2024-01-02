@@ -2,6 +2,7 @@ package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,18 +20,15 @@ public class Rating {
     @Column(name = "id")
     private int id;
 
-    @NotNull
-    @NotEmpty(message = "Moody's rating is mandatory")
+    @NotBlank(message = "Moody's rating is mandatory")
     @Column(name = "moodys_rating")
     private String moodysRating;
 
-    @NotNull
-    @NotEmpty(message = "Sand P. rating is mandatory")
+    @NotBlank(message = "Sand P. rating is mandatory")
     @Column(name = "sand_p_rating")
     private String sandPRating;
 
-    @NotNull
-    @NotEmpty(message = "Fitch rating is mandatory")
+    @NotBlank(message = "Fitch rating is mandatory")
     @Column(name = "fitch_rating")
     private String fitchRating;
 

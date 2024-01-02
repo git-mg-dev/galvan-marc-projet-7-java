@@ -1,6 +1,5 @@
 package com.nnk.springboot.controllers;
 
-import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.service.TradeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
 
@@ -24,7 +22,7 @@ public class TradeController {
 
     //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
 
-    @RequestMapping("/trade/list")
+    @GetMapping("/trade/list")
     public String displayTradeList(Model model)
     {
         List<Trade> trades = tradeService.findAll();

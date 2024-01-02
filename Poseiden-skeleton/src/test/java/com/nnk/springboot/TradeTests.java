@@ -23,7 +23,7 @@ public class TradeTests {
 
 	@Test
 	public void tradeTest() {
-		Trade trade = new Trade("Trade Account", "Type");
+		Trade trade = new Trade("Trade Account", "Type", 12d);
 
 		// Save
 		trade = tradeService.save(trade);

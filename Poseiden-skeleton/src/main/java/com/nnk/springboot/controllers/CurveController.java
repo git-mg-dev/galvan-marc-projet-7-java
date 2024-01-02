@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
 
@@ -23,7 +22,7 @@ public class CurveController {
 
     //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
 
-    @RequestMapping("/curvePoint/list")
+    @GetMapping("/curvePoint/list")
     public String displayCurvePointList(Model model)
     {
         List<CurvePoint> curvePointList = curvePointService.findAll();

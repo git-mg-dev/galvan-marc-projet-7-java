@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>Access denied</title>
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css">
+</head>
+<body>
+   <div class="container">
+       <div class="row">
+           <h3>Access Denied Exception</h3>
+       </div>
+       <div class="row">
+           <div class="col-12 text-right">
+               Logged in user: <b th:inline="text"  class="user"> TODO </b>
+               <form th:action="@{/logout}" method="POST">
+                   <input type="submit" value="Logout"/>
+               </form>
+           </div>
+       </div>
+   </div>
+</body>
+</html>   

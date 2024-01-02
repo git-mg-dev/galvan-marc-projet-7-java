@@ -1,6 +1,7 @@
 package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,33 +19,27 @@ public class Rule {
     @Column(name = "id")
     private int id;
 
-    @NotNull
-    @NotEmpty(message = "Name is mandatory")
+    @NotBlank(message = "Name is mandatory")
     @Column(name = "name")
     private String name;
 
-    @NotNull
-    @NotEmpty(message = "Description is mandatory")
+    @NotBlank(message = "Description is mandatory")
     @Column(name = "description")
     private String description;
 
-    @NotNull
-    @NotEmpty(message = "Json is mandatory")
+    @NotBlank(message = "Json is mandatory")
     @Column(name = "json")
     private String json;
 
-    @NotNull
-    @NotEmpty(message = "Template is mandatory")
+    @NotBlank(message = "Template is mandatory")
     @Column(name = "template")
     private String template;
 
-    @NotNull
-    @NotEmpty(message = "SQL is mandatory")
+    @NotBlank(message = "SQL is mandatory")
     @Column(name = "sql_str")
     private String sqlStr;
 
-    @NotNull
-    @NotEmpty(message = "SQL Part is mandatory")
+    @NotBlank(message = "SQL Part is mandatory")
     @Column(name = "sql_part")
     private String sqlPart;
 

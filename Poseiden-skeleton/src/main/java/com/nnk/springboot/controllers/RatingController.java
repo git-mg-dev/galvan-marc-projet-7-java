@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
 
@@ -23,7 +22,7 @@ public class RatingController {
 
     //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
 
-    @RequestMapping("/rating/list")
+    @GetMapping("/rating/list")
     public String displayRatingList(Model model)
     {
         List<Rating> ratings = ratingService.findAll();

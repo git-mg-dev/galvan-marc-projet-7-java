@@ -2,6 +2,7 @@ package com.nnk.springboot.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,13 +22,11 @@ public class Trade {
     @Column(name = "id")
     private int id;
 
-    @NotNull
-    @NotEmpty(message = "Account is mandatory")
+    @NotBlank(message = "Account is mandatory")
     @Column(name = "account")
     private String account;
 
-    @NotNull
-    @NotEmpty(message = "Type is mandatory")
+    @NotBlank(message = "Type is mandatory")
     @Column(name = "type")
     private String type;
 
@@ -87,8 +86,9 @@ public class Trade {
     @Column(name = "side")
     private String side;
 
-    public Trade(String account, String type) {
+    public Trade(String account, String type, double buyQuantity) {
         this.account = account;
         this.type = type;
+        this.buyQuantity = buyQuantity;
     }
 }

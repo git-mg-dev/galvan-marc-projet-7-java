@@ -10,7 +10,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import jakarta.validation.Valid;
 
@@ -22,7 +21,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @RequestMapping("/user/list")
+    @GetMapping("/user/list")
     public String displayUserList(Model model)
     {
         List<User> user = userService.findAll();
@@ -37,6 +36,8 @@ public class UserController {
 
     @PostMapping("/user/validate")
     public String validateAddUser(@Valid User user, BindingResult bindingResult, Model model) {
+
+        //TODO: handle username already exists
 
         if (!bindingResult.hasErrors()) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
