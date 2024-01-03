@@ -2,6 +2,7 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -22,10 +23,12 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/user/list")
-    public String displayUserList(Model model)
+    public String displayUserList(HttpServletRequest httpServletRequest, Model model)
     {
         List<User> user = userService.findAll();
         model.addAttribute("users", user);
+        model.addAttribute("username", httpServletRequest.getRemoteUser());
+
         return "user/list";
     }
 

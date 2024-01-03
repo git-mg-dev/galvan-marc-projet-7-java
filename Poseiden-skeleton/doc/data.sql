@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS bid_list;
 DROP TABLE IF EXISTS trade;
 DROP TABLE IF EXISTS curve_point;
 DROP TABLE IF EXISTS rating;
-DROP TABLE IF EXISTS rule_name;
+DROP TABLE IF EXISTS rule;
 DROP TABLE IF EXISTS users;
 
 CREATE TABLE bid_list (
@@ -93,7 +93,7 @@ CREATE TABLE rule (
 
 CREATE TABLE users (
   id tinyint(4) NOT NULL AUTO_INCREMENT,
-  username VARCHAR(125),
+  username VARCHAR(125) UNIQUE,
   password VARCHAR(125),
   fullname VARCHAR(125),
   role VARCHAR(125),
@@ -101,5 +101,6 @@ CREATE TABLE users (
   PRIMARY KEY (id)
 );
 
-insert into users(fullname, username, password, role) values("Administrator", "admin", "$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa", "ADMIN");
-insert into users(fullname, username, password, role) values("User", "user", "$2a$10$pBV8ILO/s/nao4wVnGLrh.sa/rnr5pDpbeC4E.KNzQWoy8obFZdaa", "USER");
+insert into users(fullname, username, password, role) values("Administrator", "admin", "$2a$10$hlSnwA0RZQYkYSTbZdQFFeBADQG26ht6.CRE.zaLlT6z3QlL.fzhu", "ADMIN");
+insert into users(fullname, username, password, role) values("User", "user", "$2a$10$hlSnwA0RZQYkYSTbZdQFFeBADQG26ht6.CRE.zaLlT6z3QlL.fzhu", "USER");
+insert into users(fullname, username, password, role) values("admin test", "aadmin", "$2a$10$hlSnwA0RZQYkYSTbZdQFFeBADQG26ht6.CRE.zaLlT6z3QlL.fzhu", "ADMIN");

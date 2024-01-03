@@ -2,6 +2,7 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.BidList;
 import com.nnk.springboot.service.BidListService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,13 +22,12 @@ public class BidListController {
     @Autowired
     private BidListService bidListService;
 
-    //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
-
     @GetMapping("/bidList/list")
-    public String displayBidList(Model model)
+    public String displayBidList(HttpServletRequest httpServletRequest, Model model)
     {
         List<BidList> bidList = bidListService.findAll();
         model.addAttribute("bidLists", bidList);
+        model.addAttribute("username", httpServletRequest.getRemoteUser());
 
         return "bidList/list";
     }

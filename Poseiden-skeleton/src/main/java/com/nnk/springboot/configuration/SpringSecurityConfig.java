@@ -1,45 +1,43 @@
 package com.nnk.springboot.configuration;
 
-import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
 public class SpringSecurityConfig {
-    @Value("${app.jwt.secret}")
-    private String jwtKey;
-
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                //.csrf(AbstractHttpConfigurer::disable)
-                //.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(
                 auth -> {
+                    auth.requestMatchers("/login").permitAll();
+                    auth.requestMatchers("/token").permitAll();
+                    //auth.requestMatchers("/error/*").permitAll();
                     auth.requestMatchers("/home").hasRole("ADMIN");
                     auth.requestMatchers("/admin/*").hasRole("ADMIN");
                     auth.requestMatchers("/user/*").hasRole("ADMIN");
@@ -50,11 +48,22 @@ public class SpringSecurityConfig {
                     auth.requestMatchers("/trade/*").hasRole("USER");
                     auth.anyRequest().authenticated();
                 })
-                .formLogin(Customizer.withDefaults())
-                .logout(logout -> logout
+                /*.formLogin(form -> form
+                        .loginPage("/login")
+                        //.loginProcessingUrl("/token")
+                        .defaultSuccessUrl("/")
+                        .failureUrl("/login?error")
+                        .permitAll())*/
+                /*.logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .permitAll()
-                )
+                )*/
+                /*.exceptionHandling(
+                        exception -> {
+                            exception.accessDeniedHandler(accessDeniedHandler()).accessDeniedPage("/error/403");
+                            exception.authenticationEntryPoint(entryPoint()).accessDeniedPage("/error/401");
+                        }
+                )*/
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }
@@ -67,18 +76,16 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    public JwtEncoder jwtEncoder() {
-        return new NimbusJwtEncoder(new ImmutableSecret<>(this.jwtKey.getBytes()));
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKey = new SecretKeySpec(this.jwtKey.getBytes(), 0, this.jwtKey.getBytes().length, "RSA");
-        return NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build();
-    }
-
-    @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    /*
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() { return new CustomAccessDeniedHandler(); }
+
+    @Bean
+    public AuthenticationEntryPoint entryPoint() { return new JwtAuthenticationEntryPoint(); }
+
+     */
 }

@@ -2,6 +2,7 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Trade;
 import com.nnk.springboot.service.TradeService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,13 +21,13 @@ public class TradeController {
     @Autowired
     private TradeService tradeService;
 
-    //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
-
     @GetMapping("/trade/list")
-    public String displayTradeList(Model model)
+    public String displayTradeList(HttpServletRequest httpServletRequest, Model model)
     {
         List<Trade> trades = tradeService.findAll();
         model.addAttribute("trades", trades);
+        model.addAttribute("username", httpServletRequest.getRemoteUser());
+
         return "trade/list";
     }
 

@@ -2,6 +2,7 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Rating;
 import com.nnk.springboot.service.RatingService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,13 +21,13 @@ public class RatingController {
     @Autowired
     private RatingService ratingService;
 
-    //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
-
     @GetMapping("/rating/list")
-    public String displayRatingList(Model model)
+    public String displayRatingList(HttpServletRequest httpServletRequest, Model model)
     {
         List<Rating> ratings = ratingService.findAll();
         model.addAttribute("ratings", ratings);
+        model.addAttribute("username", httpServletRequest.getRemoteUser());
+
         return "rating/list";
     }
 

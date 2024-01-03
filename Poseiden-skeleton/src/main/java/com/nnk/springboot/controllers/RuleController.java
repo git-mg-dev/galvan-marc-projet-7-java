@@ -2,6 +2,7 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.Rule;
 import com.nnk.springboot.service.RuleService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,13 +21,13 @@ public class RuleController {
     @Autowired
     private RuleService ruleService;
 
-    //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
-
     @GetMapping("/rule/list")
-    public String displayRuleList(Model model)
+    public String displayRuleList(HttpServletRequest httpServletRequest, Model model)
     {
         List<Rule> rules = ruleService.findAll();
         model.addAttribute("rules", rules);
+        model.addAttribute("username", httpServletRequest.getRemoteUser());
+
         return "rule/list";
     }
 

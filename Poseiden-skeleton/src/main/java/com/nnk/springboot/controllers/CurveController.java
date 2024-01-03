@@ -2,6 +2,7 @@ package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.CurvePoint;
 import com.nnk.springboot.service.CurvePointService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,13 +21,12 @@ public class CurveController {
     @Autowired
     private CurvePointService curvePointService;
 
-    //TODO: remettre [[${#httpServletRequest.remoteUser}]] ligne 20 du template list.html
-
     @GetMapping("/curvePoint/list")
-    public String displayCurvePointList(Model model)
+    public String displayCurvePointList(HttpServletRequest httpServletRequest, Model model)
     {
         List<CurvePoint> curvePointList = curvePointService.findAll();
         model.addAttribute("curvePoints", curvePointList);
+        model.addAttribute("username", httpServletRequest.getRemoteUser());
 
         return "curvePoint/list";
     }
