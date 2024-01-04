@@ -1,10 +1,10 @@
 package com.nnk.springboot.controllers;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.domain.UserForm;
 import com.nnk.springboot.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,20 +33,23 @@ public class UserController {
     }
 
     @GetMapping("/user/add")
-    public String displayAddUserForm(User user) {
+    public String displayAddUserForm(UserForm userForm) {
         return "user/add";
     }
 
     @PostMapping("/user/validate")
-    public String validateAddUser(@Valid User user, BindingResult bindingResult, Model model) {
-
-        //TODO: handle username already exists
+    public String validateAddUser(@Valid UserForm userForm, BindingResult bindingResult, Model model) {
 
         if (!bindingResult.hasErrors()) {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            user.setPassword(encoder.encode(user.getPassword()));
-            user = userService.save(user);
-            return "redirect:/user/list";
+            User checkUser = userService.findByUsername(userForm.getUsername());
+
+            if(checkUser == null) {
+                User user = userService.save(userForm);
+                return "redirect:/user/list";
+            } else {
+                String error = "Username already taken, please use another one";
+                model.addAttribute("usernameError", error);
+            }
         }
 
         return "user/add";
@@ -58,9 +61,9 @@ public class UserController {
         if(id != null) {
             Optional<User> optionalUser = userService.findById(id);
             if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                user.setPassword("");
-                model.addAttribute("user", user);
+                UserForm userForm = new UserForm(optionalUser.get());
+                userForm.setPassword("");
+                model.addAttribute("userForm", userForm);
                 return "user/update";
             } else {
                 return "redirect:/user/list?error";
@@ -71,17 +74,22 @@ public class UserController {
     }
 
     @PostMapping("/user/update")
-    public String updateUser(@Valid User user, BindingResult bindingResult, Model model) {
+    public String updateUser(@Valid UserForm userForm, BindingResult bindingResult, Model model) {
 
-        if (bindingResult.hasErrors()) {
-            return "user/update";
+        if (!bindingResult.hasErrors()) {
+            User checkUser = userService.findByUsername(userForm.getUsername());
+
+            if((checkUser == null) || (checkUser != null && checkUser.getId() == userForm.getId())) {
+                User user = userService.save(userForm);
+
+                return "redirect:/user/list";
+            } else {
+                String error = "Username already taken, please use another one";
+                model.addAttribute("usernameError", error);
+            }
         }
 
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        user.setPassword(encoder.encode(user.getPassword()));
-        userService.save(user);
-
-        return "redirect:/user/list";
+        return "user/update";
     }
 
     @GetMapping("/user/delete/{id}")

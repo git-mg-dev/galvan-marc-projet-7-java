@@ -103,4 +103,3 @@ CREATE TABLE users (
 
 insert into users(fullname, username, password, role) values("Administrator", "admin", "$2a$10$hlSnwA0RZQYkYSTbZdQFFeBADQG26ht6.CRE.zaLlT6z3QlL.fzhu", "ADMIN");
 insert into users(fullname, username, password, role) values("User", "user", "$2a$10$hlSnwA0RZQYkYSTbZdQFFeBADQG26ht6.CRE.zaLlT6z3QlL.fzhu", "USER");
-insert into users(fullname, username, password, role) values("admin test", "aadmin", "$2a$10$hlSnwA0RZQYkYSTbZdQFFeBADQG26ht6.CRE.zaLlT6z3QlL.fzhu", "ADMIN");

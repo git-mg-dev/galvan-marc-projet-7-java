@@ -9,10 +9,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -35,9 +33,9 @@ public class SpringSecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(
                 auth -> {
+                    auth.requestMatchers("/").permitAll();
                     auth.requestMatchers("/login").permitAll();
                     auth.requestMatchers("/token").permitAll();
-                    //auth.requestMatchers("/error/*").permitAll();
                     auth.requestMatchers("/home").hasRole("ADMIN");
                     auth.requestMatchers("/admin/*").hasRole("ADMIN");
                     auth.requestMatchers("/user/*").hasRole("ADMIN");
@@ -48,22 +46,21 @@ public class SpringSecurityConfig {
                     auth.requestMatchers("/trade/*").hasRole("USER");
                     auth.anyRequest().authenticated();
                 })
-                /*.formLogin(form -> form
+                .formLogin(form -> form
                         .loginPage("/login")
                         //.loginProcessingUrl("/token")
-                        .defaultSuccessUrl("/")
+                        //.defaultSuccessUrl("/")
                         .failureUrl("/login?error")
-                        .permitAll())*/
+                        .permitAll())
                 /*.logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .permitAll()
                 )*/
-                /*.exceptionHandling(
+                .exceptionHandling(
                         exception -> {
                             exception.accessDeniedHandler(accessDeniedHandler()).accessDeniedPage("/error/403");
-                            exception.authenticationEntryPoint(entryPoint()).accessDeniedPage("/error/401");
                         }
-                )*/
+                )
                 .httpBasic(Customizer.withDefaults())
                 .build();
     }
@@ -80,12 +77,8 @@ public class SpringSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /*
     @Bean
-    public AccessDeniedHandler accessDeniedHandler() { return new CustomAccessDeniedHandler(); }
-
-    @Bean
-    public AuthenticationEntryPoint entryPoint() { return new JwtAuthenticationEntryPoint(); }
-
-     */
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
 }

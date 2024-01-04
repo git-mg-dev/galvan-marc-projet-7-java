@@ -1,8 +1,10 @@
 package com.nnk.springboot.service;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.domain.UserForm;
 import com.nnk.springboot.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +23,10 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User save(User user) {
+    public User save(UserForm userForm) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        userForm.setPassword(encoder.encode(userForm.getPassword()));
+        User user = new User(userForm);
         return userRepository.save(user);
     }
 

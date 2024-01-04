@@ -8,18 +8,18 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+@Log4j2
 @Controller
 public class LoginController {
 
@@ -30,7 +30,7 @@ public class LoginController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @GetMapping("login")
+    @GetMapping("/login")
     public String login() {
         return "login";
     }
@@ -41,8 +41,8 @@ public class LoginController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(), jwtRequest.getPassword()));
         } catch (UsernameNotFoundException | BadCredentialsException e) {
-            session.setAttribute("msg","Bad Credentials");
-            return "login";
+            log.error("User authentication failed: " + e.getMessage());
+            return "redirect:login?error";
         }
 
         //Getting user details & creating cookie
@@ -55,8 +55,6 @@ public class LoginController {
             cookie.setMaxAge(Integer.MAX_VALUE);
             response.addCookie(cookie);
 
-            System.out.println("token: " + token);
-
             if(userDetails.getRole().equals("ADMIN")) {
                 return "redirect:admin/home";
             } else if (userDetails.getRole().equals("USER")) {
@@ -64,8 +62,8 @@ public class LoginController {
             }
 
         } catch(Exception e) {
-            session.setAttribute("msg","Credentials were right But something went wrong!!");
-            return "login";
+            log.error("User authentication failed: " + e.getMessage());
+            return "redirect:login?error";
         }
 
         return "login";
@@ -84,14 +82,4 @@ public class LoginController {
 
         return "redirect:/login?logout";
     }
-
-/*    @GetMapping("error")
-    public ModelAndView error() {
-        ModelAndView mav = new ModelAndView();
-        String errorMessage= "You are not authorized for the requested data.";
-        mav.addObject("errorMsg", errorMessage);
-        mav.setViewName("403");
-        return mav;
-    }
- */
 }

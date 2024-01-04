@@ -1,12 +1,12 @@
 package com.nnk.springboot;
 
 import com.nnk.springboot.domain.User;
+import com.nnk.springboot.domain.UserForm;
 import com.nnk.springboot.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
@@ -23,19 +23,19 @@ public class UserTests {
 
 	@Test
 	public void userTest() {
-		User user = new User("Azerty", "Test", "password", "USER");
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		user.setPassword(encoder.encode(user.getPassword()));
+		UserForm userForm = new UserForm("azertyt", "Azerty Test", "Password#1", "USER");
 
 		// Save
-		user = userService.save(user);
+		User user = userService.save(userForm);
 		assertNotNull(user.getId());
-        assertEquals("Azerty", user.getUsername());
+        assertEquals(userForm.getUsername(), user.getUsername());
 
 		// Update
-		user.setUsername("Uiop");
-		user = userService.save(user);
-        assertEquals("Uiop", user.getUsername());
+		userForm.setId(user.getId());
+		userForm.setUsername("Uiop");
+		userForm.setPassword("Password#2");
+		user = userService.save(userForm);
+        assertEquals(userForm.getUsername(), user.getUsername());
 
 		// Find
 		List<User> listResult = userService.findAll();

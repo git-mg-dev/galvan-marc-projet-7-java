@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Log4j2
 @Service
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
@@ -49,25 +51,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             UsernamePasswordAuthenticationToken uPAT = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                             uPAT.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                             SecurityContextHolder.getContext().setAuthentication(uPAT);
+
+                            log.info("User " + username + " authenticated with success");
+
                         } else {
-                            System.out.println("Token is not validate");
-                            //TODO: log
+                            log.info("Invalid token (wrong user or expired token");
                         }
                     } else {
-                        // no username in cookie
-                        //TODO: log
+                        log.info("No username in cookie");
                     }
                 } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                    //TODO: log
+                    log.error("Authentication error: " + e.getMessage());
                 }
             } else {
-                // no cookie found
-                //TODO: log
+                log.info("No cookie found");
             }
         } else {
-            // no cookie found
-            //TODO: log
+            log.info("No cookie found");
         }
         filterChain.doFilter(request, response);
     }

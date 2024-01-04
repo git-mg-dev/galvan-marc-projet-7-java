@@ -18,7 +18,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         Exception exception = new Exception("403 - Access denied");
 
-
         OutputStream outputStream = response.getOutputStream();
 
         ObjectMapper mapper = new ObjectMapper();

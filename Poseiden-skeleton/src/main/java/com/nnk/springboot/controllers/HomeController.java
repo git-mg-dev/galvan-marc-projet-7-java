@@ -1,25 +1,14 @@
 package com.nnk.springboot.controllers;
 
-import com.nnk.springboot.domain.JwtRequest;
 import com.nnk.springboot.domain.User;
 import com.nnk.springboot.service.JWTService;
 import com.nnk.springboot.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-
-import java.security.Principal;
 
 @Controller
 public class HomeController
@@ -51,6 +40,11 @@ public class HomeController
 		return "home";
 	}
 
+	/**
+	 * Checks if a cookie exists for this app
+	 * @param request
+	 * @return role of user in cookie
+	 */
 	private String checkCookies(HttpServletRequest request) {
 		String jwtToken = "";
 

@@ -19,6 +19,11 @@ public class JWTService {
     @Value("${app.jwt.secret}")
     private String jwtKey;
 
+    /**
+     * Generates a new token for authenticated user
+     * @param user authenticated
+     * @return Encrypted token
+     */
     public String generateToken(User user) {
         Instant now = Instant.now();
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
@@ -32,24 +37,52 @@ public class JWTService {
         return jwtEncoder().encode(jwtEncoderParameters).getTokenValue();
     }
 
+    /**
+     * Retrieves username from encrypted token
+     * @param token
+     * @return username
+     */
     public String extractUsername(String token) {
         return extractClaim(token, "sub");
     }
 
+    /**
+     * Retrieves cookie expiration date from encrypted token
+     * @param token
+     * @return expiration date
+     */
     public Date extractExpiration(String token) {
         Instant issuedAt = extractClaim(token, "exp");
         return Date.from(issuedAt);
     }
 
+    /**
+     * Extracts a specific claim from encrypted token
+     * @param token
+     * @param claim name of claim to extract
+     * @return retrieved data
+     * @param <T>
+     */
     public <T> T extractClaim(String token, String claim) {
         Jwt jwt = extractAllClaims(token);
         return jwt.getClaim(claim);
     }
 
+    /**
+     * Extracts all claims from encrypted token
+     * @param token
+     * @return uncrypted token
+     */
     private Jwt extractAllClaims(String token) {
         return jwtDecoder().decode(token);
     }
 
+    /**
+     * Checks if token is valid
+     * @param token to verify
+     * @param userDetails authenticated user
+     * @return true or false
+     */
     public Boolean validateToken(String token, UserDetails userDetails) {
         String username = extractUsername(token);
 
@@ -59,6 +92,12 @@ public class JWTService {
         return (isSameUser && !isTokenExpired);
     }
 
+    /**
+     * Checks if token is valid
+     * @param token to verify
+     * @param user authenticated user
+     * @return true or false
+     */
     public Boolean validateToken(String token, User user) {
         String username = extractUsername(token);
 
