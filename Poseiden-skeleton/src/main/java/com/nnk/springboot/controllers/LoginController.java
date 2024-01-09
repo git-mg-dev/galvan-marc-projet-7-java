@@ -31,7 +31,18 @@ public class LoginController {
     private AuthenticationManager authenticationManager;
 
     @GetMapping("/login")
-    public String login() {
+    public String login(HttpServletRequest request) {
+
+        //Check cookies
+        String roleInCookie = jwtService.checkCookies(request);
+        if(!roleInCookie.isEmpty()) {
+            if(roleInCookie.equals("ADMIN")) {
+                return "redirect:admin/home";
+            } else if (roleInCookie.equals("USER")) {
+                return "redirect:bidList/list";
+            }
+        }
+
         return "login";
     }
 
@@ -49,7 +60,7 @@ public class LoginController {
         try {
             User userDetails = userService.findByUsername(jwtRequest.getUsername());
 
-            final String token = jwtService.generateToken(userDetails);
+            final String token = jwtService.generateToken(userDetails, userDetails.getRole());
 
             Cookie cookie = new Cookie("token-poseidon", token);
             cookie.setMaxAge(Integer.MAX_VALUE);

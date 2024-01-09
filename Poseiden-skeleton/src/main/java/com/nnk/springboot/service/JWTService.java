@@ -2,6 +2,8 @@ package com.nnk.springboot.service;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.nnk.springboot.domain.User;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,13 +26,14 @@ public class JWTService {
      * @param user authenticated
      * @return Encrypted token
      */
-    public String generateToken(User user) {
+    public String generateToken(User user, String role) {
         Instant now = Instant.now();
         JwtClaimsSet claimsSet = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
                 .expiresAt(now.plus(1, ChronoUnit.DAYS))
                 .subject(user.getUsername())
+                .claim("role", role)
                 .build();
 
         JwtEncoderParameters jwtEncoderParameters = JwtEncoderParameters.from(JwsHeader.with(MacAlgorithm.HS256).build(), claimsSet);
@@ -57,13 +60,26 @@ public class JWTService {
     }
 
     /**
+     * Retrieves user role from encrypted token
+     * @param token
+     * @return user role
+     */
+    public String extractRole(String token) {
+        String role = extractClaim(token, "role");
+        if(role == null) {
+            role = "";
+        }
+        return role;
+    }
+
+    /**
      * Extracts a specific claim from encrypted token
      * @param token
      * @param claim name of claim to extract
      * @return retrieved data
      * @param <T>
      */
-    public <T> T extractClaim(String token, String claim) {
+    private <T> T extractClaim(String token, String claim) {
         Jwt jwt = extractAllClaims(token);
         return jwt.getClaim(claim);
     }
@@ -75,6 +91,16 @@ public class JWTService {
      */
     private Jwt extractAllClaims(String token) {
         return jwtDecoder().decode(token);
+    }
+
+    /**
+     * Check if token is valid based on expiration date only
+     * @param token
+     * @return true or false
+     */
+    public Boolean validateToken(String token) {
+        boolean isTokenExpired = extractExpiration(token).before(new Date());
+        return !isTokenExpired;
     }
 
     /**
@@ -93,18 +119,29 @@ public class JWTService {
     }
 
     /**
-     * Checks if token is valid
-     * @param token to verify
-     * @param user authenticated user
-     * @return true or false
+     * Checks if a cookie exists for this app
+     * @param request
+     * @return role of user in cookie
      */
-    public Boolean validateToken(String token, User user) {
-        String username = extractUsername(token);
+    public String checkCookies(HttpServletRequest request) {
+        String jwtToken = "";
 
-        boolean isSameUser = username.equals(user.getUsername());
-        boolean isTokenExpired = extractExpiration(token).before(new Date());
+        if(request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("token-poseidon")) {
+                    jwtToken = cookie.getValue();
+                    break;
+                }
+            }
 
-        return (isSameUser && !isTokenExpired);
+            if(!jwtToken.isEmpty()) {
+                if (validateToken(jwtToken)) {
+                    return extractRole(jwtToken);
+                }
+            }
+        }
+
+        return "";
     }
 
     @Bean
